@@ -111,12 +111,19 @@ public class SurveyController {
         return map;
     }
 
-   /* @Bean
+    /*@Bean
     public ObjectMapper registerJdkModuleAndGetMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         Jdk8Module module = new Jdk8Module();
         module.configureAbsentsAsNulls(true);
         objectMapper.registerModule(module);
         return objectMapper;
+    }
+
+    public JsonNode retriveQuestionsForSurvey1(@PathVariable String surveyId) throws JsonProcessingException {
+        ObjectMapper mapper = registerJdkModuleAndGetMapper();
+        String jsonString = mapper.writeValueAsString(surveyService.retrieveQuestions(surveyId));
+        return mapper.readTree(jsonString);
+
     }*/
 }

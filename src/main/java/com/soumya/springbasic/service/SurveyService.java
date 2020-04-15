@@ -32,8 +32,8 @@ public class SurveyService {
         List<Question> questions = new ArrayList<>(Arrays.asList(question1,
                 question2, question3, question4));
 
-        Survey survey = new Survey("Survey1", "My Favorite Survey",
-                "Description of the Survey", questions);
+        Survey survey = new Survey("Survey1", Optional.of("My Favorite Survey"),
+                Optional.of("Description of the Survey"), Optional.of(questions));
 
         surveys.add(survey);
     }
@@ -53,7 +53,7 @@ public class SurveyService {
     public Optional<List<Question>> retrieveQuestions(String surveyId) {
         for (Survey survey : surveys) {
             if (survey.getSurveyId().equals(surveyId))
-                return Optional.of(survey.getQuestions());
+                return survey.getQuestions();
         }
         return Optional.empty();
     }
@@ -77,7 +77,7 @@ public class SurveyService {
             return Optional.empty();
         String randomId = new BigInteger(132, random).toString(32);
         question.setQuestionId(randomId);
-        survey.get().getQuestions().add(question);
+        survey.get().getQuestions().get().add(question);
         return Optional.of(question);
     }
 
@@ -99,8 +99,8 @@ public class SurveyService {
         Optional<Survey> survey = retrieveSurvey(surveyId);
         if (survey.isPresent()) {
             Survey mySurvey = survey.get();
-            mySurvey.setDescription(newSurvey.getDescription());
-            mySurvey.setTitle(newSurvey.getDescription());
+            mySurvey.setDescription(newSurvey.getDescription().get());
+            mySurvey.setTitle(newSurvey.getDescription().get());
             return true;
         }
         return false;

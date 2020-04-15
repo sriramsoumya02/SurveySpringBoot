@@ -1,15 +1,19 @@
 package com.soumya.springbasic.controller;
 
+import com.soumya.springbasic.configuration.ApplicationPropertiesConfiguration;
 import com.soumya.springbasic.model.Question;
 import com.soumya.springbasic.model.Survey;
 import com.soumya.springbasic.service.SurveyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -17,7 +21,14 @@ public class SurveyController {
 
     @Autowired
     private SurveyService surveyService;
+    @Value("${crud.updateMessage}")
+    private String updateMessage;
+    @Value("${crud.deleteMessage}")
+    private String deleteMessage;
 
+    @Autowired
+    private ApplicationPropertiesConfiguration appConfig;
+    //private ObjectMapper objectMapper = registerJdkModuleAndGetMapper();
 
     @GetMapping("/surveys")
     public List<Survey> retiveAllSurvey() {
@@ -26,10 +37,8 @@ public class SurveyController {
 
     @GetMapping("/surveys/{surveyId}/questions")
     public List<Question> retriveQuestionsForSurvey(@PathVariable String surveyId) {
-        if (surveyService.retrieveQuestions(surveyId).isPresent())
-            return surveyService.retrieveQuestions(surveyId).get();
-        else
-            return null;
+        Optional<List<Question>> questions = surveyService.retrieveQuestions(surveyId);
+        return questions.orElse(null);
     }
 
     /**
@@ -48,7 +57,7 @@ public class SurveyController {
     @PostMapping("/surveys/{surveyId}/questions")
     public ResponseEntity<?> addQuestionToSurvey(@PathVariable String surveyId, @RequestBody Question newQuestion) {
         Optional<Question> myQuestion = surveyService.addQuestion(surveyId, newQuestion);
-        if (!myQuestion.isPresent()) {
+        if (myQuestion.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").buildAndExpand(myQuestion.get().getQuestionId()).toUri();
@@ -73,7 +82,7 @@ public class SurveyController {
     public ResponseEntity<?> removeSurveyByID(@PathVariable String surveyId) {
         boolean isDeleted = surveyService.removeSurvey(surveyId);
         if (isDeleted)
-            return ResponseEntity.ok("Deleted");
+            return ResponseEntity.ok(deleteMessage);
         return ResponseEntity.notFound().build();
     }
 
@@ -81,7 +90,7 @@ public class SurveyController {
     public ResponseEntity<?> removeQuestionForSurvey(@PathVariable String surveyId, @PathVariable String questionId) {
         boolean isDeleted = surveyService.removeQuestion(surveyId, questionId);
         if (isDeleted)
-            return ResponseEntity.ok("Deleted");
+            return ResponseEntity.ok(deleteMessage);
         return ResponseEntity.notFound().build();
     }
 
@@ -89,8 +98,25 @@ public class SurveyController {
     public ResponseEntity<?> updateSurvey(@PathVariable String surveyId, @RequestBody Survey survey) {
         boolean ismodified = surveyService.modifySurvey(surveyId, survey);
         if (ismodified)
-            return ResponseEntity.ok("Updated successfully");
+            return ResponseEntity.ok(updateMessage);
         return ResponseEntity.notFound().build();
     }
 
+    @RequestMapping(value = "/myconfig", method = RequestMethod.GET)
+    public Map getApplicationProperties() {
+        Map map = new HashMap();
+        map.put("applicationName", appConfig.getName());
+        map.put("applicationType", appConfig.getType());
+        map.put("applicationProgramingLanguage", appConfig.getProgramminglanguage());
+        return map;
+    }
+
+   /* @Bean
+    public ObjectMapper registerJdkModuleAndGetMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Jdk8Module module = new Jdk8Module();
+        module.configureAbsentsAsNulls(true);
+        objectMapper.registerModule(module);
+        return objectMapper;
+    }*/
 }

@@ -1,14 +1,15 @@
 package com.soumya.springbasic.model;
 
 import java.util.List;
+import java.util.Optional;
 
 public class Survey {
     private String surveyId;
-    private String title;
-    private String description;
-    private List<Question> questions;
+    private Optional<String> title;
+    private Optional<String> description;
+    private Optional<List<Question>> questions;
 
-    public Survey(String surveyId, String title, String description, List<Question> questions) {
+    public Survey(String surveyId, Optional<String> title, Optional<String> description, Optional<List<Question>> questions) {
         this.surveyId = surveyId;
         this.title = title;
         this.description = description;
@@ -23,28 +24,28 @@ public class Survey {
         this.surveyId = surveyId;
     }
 
-    public String getTitle() {
+    public Optional<String> getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.title = Optional.ofNullable(title);
     }
 
-    public String getDescription() {
+    public Optional<String> getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = Optional.ofNullable(description);
     }
 
-    public List<Question> getQuestions() {
+    public Optional<List<Question>> getQuestions() {
         return questions;
     }
 
     public void setQuestions(List<Question> questions) {
-        this.questions = questions;
+        this.questions = Optional.ofNullable(questions);
     }
 
     @Override
